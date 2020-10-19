@@ -1,0 +1,14 @@
+<project default="devbuild">
+
+	<!-- Simply set the name of the plugin here, e.g. "fileUpload") instead of "sample" -->
+	<property name="name" value="goobi-plugin-step-oid" />
+
+	<!-- Use this task to let ant copy the compiled jar files to the target folders for development  -->
+	<target name="devbuild">
+		<exec executable="mvn">
+			<arg value="package"/>
+		</exec>
+		<copy file="module-main/target/plugin_intranda_step_oid.jar" todir="/opt/digiverso/goobi/plugins/step/" overwrite="true"/>
+	</target>
+
+</project>

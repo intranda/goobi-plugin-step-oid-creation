@@ -1,0 +1,18 @@
+<config_plugin>
+    <!--
+        order of configuration is:
+        1.) project name and step name matches
+        2.) step name matches and project is *
+        3.) project name matches and step name is *
+        4.) project name and step name are *
+    -->
+    <config>
+        <!-- which projects to use for (can be more then one, otherwise use *) -->
+        <project>*</project>
+        <step>*</step>
+        <solrUrl>http://example.com/solr</solrUrl>
+        <solrUsername>user</solrUsername>
+        <solrPassword>password</solrPassword>
+        <zvddDownloadUrl>http://example.com/?PPN=</zvddDownloadUrl>
+    </config>
+</config_plugin>
