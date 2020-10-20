@@ -187,6 +187,14 @@ public class OidStepPlugin implements IStepPluginVersion2 {
                     }
                 }
                 identifier.setValue(String.valueOf(oid));
+                // also write it to the physical object
+                try {
+                    Metadata urn = new Metadata(contentIdsType);
+                    urn.setValue(String.valueOf(oid));
+                    physical.addMetadata(urn);
+                } catch (MetadataTypeNotAllowedException | DocStructHasNoTypeException e) {
+                    log.error(e);
+                }
                 counter++;
             }
 
