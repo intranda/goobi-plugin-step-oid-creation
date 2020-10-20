@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -16,8 +18,10 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.goobi.beans.LogEntry;
 import org.goobi.beans.Process;
 import org.goobi.beans.Step;
+import org.goobi.production.enums.LogType;
 import org.goobi.production.enums.PluginGuiType;
 import org.goobi.production.enums.PluginReturnValue;
 import org.goobi.production.enums.PluginType;
@@ -29,10 +33,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.HttpClientHelper;
 import de.sub.goobi.helper.StorageProvider;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.SwapException;
+import de.sub.goobi.persistence.managers.ProcessManager;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -105,9 +111,13 @@ public class OidStepPlugin implements IStepPluginVersion2 {
     @Override
     public PluginReturnValue run() {
 
-        String url = "http://localhost:8080/goobi/uii/";
-        String username = "user";
-        String password = "password";
+        XMLConfiguration config = ConfigPlugins.getPluginConfig(title);
+
+        String url = config.getString("url", "http://example.com");
+        String username = config.getString("username");
+        String password = config.getString("password");
+        String headername = config.getString("headerparam", "Accept");
+        String headervalue = config.getString("headerValue", "application/json");
         // open metadata file
         MetadataType identifierType = prefs.getMetadataTypeByName("CatalogIDDigital");
         MetadataType contentIdsType = prefs.getMetadataTypeByName("_urn");
@@ -150,13 +160,14 @@ public class OidStepPlugin implements IStepPluginVersion2 {
             }
             // request number of pages + 1
             if (numberOfOids != pageList.size() + 1) {
-                // TODO WARNING; we update an existing object
-                // write something to processlog
+                // WARNING; we update an existing object
+                LogEntry entry = LogEntry.build(process.getId()).withContent("OID request was executed multiple times.").withType(LogType.INFO);
+                ProcessManager.saveLogEntry(entry);
             }
             numberOfOids = pageList.size() + 1;
 
             // get new identifiers from list
-            String response = getStringFromUrl(url + numberOfOids + ".json", username, password, "", "");
+            String response = getStringFromUrl(url + numberOfOids, username, password, headername, headervalue);
             JsonElement jsonTree = JsonParser.parseString(response);
 
             JsonObject jsonObject = jsonTree.getAsJsonObject();
@@ -249,7 +260,7 @@ public class OidStepPlugin implements IStepPluginVersion2 {
         CloseableHttpClient client = null;
         HttpGet method = new HttpGet(url);
 
-        if (username != null && password != null) {
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
             CredentialsProvider credsProvider = new BasicCredentialsProvider();
             credsProvider.setCredentials(new AuthScope(null, -1), new UsernamePasswordCredentials(username, password));
             client = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
