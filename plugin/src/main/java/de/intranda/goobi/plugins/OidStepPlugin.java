@@ -58,7 +58,7 @@ import ugh.exceptions.WriteException;
 public class OidStepPlugin implements IStepPluginVersion2 {
 
     @Getter
-    private String title = "intranda_step_oid";
+    private String title = "intranda_step_oid_creation";
 
     @Getter
     private Step step;
