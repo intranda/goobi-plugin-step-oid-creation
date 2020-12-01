@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -193,6 +194,37 @@ public class OidPluginTest {
         assertEquals("300006253.jpg", filesInMediaFolder[0]);
 
     }
+
+    @Test
+    public void testCreatePagination() throws Exception {
+        Path metaSource = Paths.get(resourcesFolder + "meta2.xml");
+        Path metaTarget = Paths.get(processDirectory.getAbsolutePath(), "meta.xml");
+
+        Files.copy(metaSource, metaTarget, StandardCopyOption.REPLACE_EXISTING);
+
+        OidStepPlugin plugin = new OidStepPlugin();
+        assertNotNull(plugin);
+        Step step = process.getSchritte().get(0);
+
+        plugin.initialize(step, "");
+        assertTrue(plugin.execute());
+
+        // open created file
+        Fileformat ff = new MetsMods(prefs);
+        ff.read(processDirectory.getAbsolutePath() +"/meta.xml");
+
+        // check physical structMap
+
+        DocStruct physical = ff.getDigitalDocument().getPhysicalDocStruct();
+        assertNotNull(physical);
+
+        DocStruct page = physical.getAllChildren().get(0);
+        assertEquals("300006253", page.getAllMetadataByType(prefs.getMetadataTypeByName("_urn")).get(0).getValue());
+        assertEquals("300006253.jpg", page.getImageName());
+
+
+    }
+
 
     public Process getProcess() {
         Project project = new Project();

@@ -42,16 +42,16 @@ import de.sub.goobi.persistence.managers.ProcessManager;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
+import ugh.dl.DocStructType;
 import ugh.dl.Fileformat;
 import ugh.dl.Metadata;
 import ugh.dl.MetadataType;
 import ugh.dl.Prefs;
 import ugh.exceptions.DocStructHasNoTypeException;
 import ugh.exceptions.MetadataTypeNotAllowedException;
-import ugh.exceptions.PreferencesException;
-import ugh.exceptions.ReadException;
-import ugh.exceptions.WriteException;
+import ugh.exceptions.UGHException;
 
 @PluginImplementation
 @Log4j2
@@ -144,8 +144,38 @@ public class OidStepPlugin implements IStepPluginVersion2 {
             }
 
             // get page objects
-            DocStruct physical = fileformat.getDigitalDocument().getPhysicalDocStruct();
+            DigitalDocument dd = fileformat.getDigitalDocument();
+            DocStruct physical = dd.getPhysicalDocStruct();
+            if (physical == null) {
+                DocStructType physicalType = prefs.getDocStrctTypeByName("BoundBook");
+                physical = dd.createDocStruct(physicalType);
+                dd.setPhysicalDocStruct(physical);
+            }
+
             List<DocStruct> pageList = physical.getAllChildren();
+
+            if (pageList == null || pageList.isEmpty()) {
+                List<Path> images = StorageProvider.getInstance().listFiles(process.getImagesTifDirectory(false));
+                for (Path image : images) {
+                    int currentPhysicalOrder = 0;
+                    DocStruct page = dd.createDocStruct(prefs.getDocStrctTypeByName("page"));
+                    page.setImageName(image.toString());
+                    // physical page no
+                    MetadataType mdt = prefs.getMetadataTypeByName("physPageNumber");
+                    Metadata mdTemp = new Metadata(mdt);
+                    mdTemp.setValue(String.valueOf(++currentPhysicalOrder));
+                    page.addMetadata(mdTemp);
+
+                    // logical page no
+                    mdt = prefs.getMetadataTypeByName("logicalPageNumber");
+                    mdTemp = new Metadata(mdt);
+                    mdTemp.setValue("uncounted");
+
+                    page.addMetadata(mdTemp);
+                    physical.addChild(page);
+                    logical.addReferenceTo(page, "logical_physical");
+                }
+            }
 
             // get OIDs only for objects without ids
             for (DocStruct page : pageList) {
@@ -257,7 +287,7 @@ public class OidStepPlugin implements IStepPluginVersion2 {
             // save metadata file
             process.writeMetadataFile(fileformat);
 
-        } catch (ReadException | PreferencesException | WriteException | IOException | InterruptedException | SwapException | DAOException e) {
+        } catch (UGHException | IOException | InterruptedException | SwapException | DAOException e) {
             log.error(e);
         }
         return PluginReturnValue.FINISH;
