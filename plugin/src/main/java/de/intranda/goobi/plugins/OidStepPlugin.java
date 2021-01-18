@@ -175,6 +175,7 @@ public class OidStepPlugin implements IStepPluginVersion2 {
                     physical.addChild(page);
                     logical.addReferenceTo(page, "logical_physical");
                 }
+                pageList = physical.getAllChildren();
             }
 
             // get OIDs only for objects without ids
