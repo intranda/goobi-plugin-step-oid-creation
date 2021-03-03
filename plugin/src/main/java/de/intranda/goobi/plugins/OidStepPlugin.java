@@ -178,6 +178,11 @@ public class OidStepPlugin implements IStepPluginVersion2 {
                 pageList = physical.getAllChildren();
             }
 
+            if (pageList == null || pageList.isEmpty()) {
+                log.error("Process {} does not contain any images, abort OID creation", process.getId());
+                return PluginReturnValue.ERROR;
+            }
+
             // get OIDs only for objects without ids
             for (DocStruct page : pageList) {
                 List<? extends Metadata> urns = page.getAllMetadataByType(contentIdsType);
