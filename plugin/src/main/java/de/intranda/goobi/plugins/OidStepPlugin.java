@@ -156,8 +156,8 @@ public class OidStepPlugin implements IStepPluginVersion2 {
 
             if (pageList == null || pageList.isEmpty()) {
                 List<Path> images = StorageProvider.getInstance().listFiles(process.getImagesTifDirectory(false));
+                int currentPhysicalOrder = 0;
                 for (Path image : images) {
-                    int currentPhysicalOrder = 0;
                     DocStruct page = dd.createDocStruct(prefs.getDocStrctTypeByName("page"));
                     page.setImageName(image.toString());
                     // physical page no

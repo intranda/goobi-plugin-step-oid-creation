@@ -8,7 +8,7 @@
 		<exec executable="mvn">
 			<arg value="package"/>
 		</exec>
-		<copy file="module-main/target/plugin_intranda_step_oid.jar" todir="/opt/digiverso/goobi/plugins/step/" overwrite="true"/>
+		<copy file="module-main/target/plugin_intranda_step_oid_creation.jar" todir="/opt/digiverso/goobi/plugins/step/" overwrite="true"/>
 	</target>
 
 </project>
