@@ -22,6 +22,7 @@ import org.goobi.beans.Ruleset;
 import org.goobi.beans.Step;
 import org.goobi.beans.User;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -45,7 +46,7 @@ import ugh.fileformats.mets.MetsMods;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ MetadatenHelper.class, VariableReplacer.class, ConfigurationHelper.class, ProcessManager.class, MetadataManager.class,
     OidStepPlugin.class })
-@PowerMockIgnore({ "javax.management.*", "javax.net.ssl.*" })
+@PowerMockIgnore({ "javax.management.*", "javax.net.ssl.*", "jdk.internal.reflect.*" })
 
 public class OidPluginTest {
 
@@ -55,15 +56,23 @@ public class OidPluginTest {
     private File metadataDirectory;
     private Process process;
     private Prefs prefs;
-    private String resourcesFolder;
+    private static String resourcesFolder;
 
-    @Before
-    public void setUp() throws Exception {
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
         resourcesFolder = "src/test/resources/"; // for junit tests in eclipse
-
         if (!Files.exists(Paths.get(resourcesFolder))) {
             resourcesFolder = "target/test-classes/"; // to run mvn test from cli or in jenkins
         }
+        String log4jFile = resourcesFolder + "log4j2.xml"; // for junit tests in eclipse
+        System.setProperty("log4j.configurationFile", log4jFile);
+    }
+
+    @Before
+    public void setUp() throws Exception {
+
+
 
         metadataDirectory = folder.newFolder("metadata");
 
