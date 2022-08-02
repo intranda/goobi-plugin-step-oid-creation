@@ -36,7 +36,6 @@ import com.google.gson.JsonParser;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.HttpClientHelper;
 import de.sub.goobi.helper.StorageProvider;
-import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import de.sub.goobi.persistence.managers.ProcessManager;
 import lombok.Getter;
@@ -293,7 +292,7 @@ public class OidStepPlugin implements IStepPluginVersion2 {
             // save metadata file
             process.writeMetadataFile(fileformat);
 
-        } catch (UGHException | IOException | InterruptedException | SwapException | DAOException e) {
+        } catch (UGHException | IOException | SwapException e) {
             log.error(e);
         }
         return PluginReturnValue.FINISH;
