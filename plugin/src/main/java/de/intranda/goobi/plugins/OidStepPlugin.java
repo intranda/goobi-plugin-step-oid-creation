@@ -18,7 +18,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.goobi.beans.LogEntry;
 import org.goobi.beans.Process;
 import org.goobi.beans.Step;
 import org.goobi.production.enums.LogType;
@@ -34,10 +33,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.helper.Helper;
 import de.sub.goobi.helper.HttpClientHelper;
 import de.sub.goobi.helper.StorageProvider;
 import de.sub.goobi.helper.exceptions.SwapException;
-import de.sub.goobi.persistence.managers.ProcessManager;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -196,8 +195,7 @@ public class OidStepPlugin implements IStepPluginVersion2 {
             // request number of pages + 1
             if (numberOfOids != pageList.size() + 1) {
                 // WARNING; we update an existing object
-                LogEntry entry = LogEntry.build(process.getId()).withContent("OID request was executed multiple times.").withType(LogType.INFO);
-                ProcessManager.saveLogEntry(entry);
+                Helper.addMessageToProcessJournal(process.getId(), LogType.INFO, "OID request was executed multiple times.", "- automatic -");
             }
             numberOfOids = pageList.size() + 1;
 
