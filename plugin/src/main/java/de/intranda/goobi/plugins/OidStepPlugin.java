@@ -34,9 +34,9 @@ import com.google.gson.JsonParser;
 
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.Helper;
-import de.sub.goobi.helper.HttpClientHelper;
 import de.sub.goobi.helper.StorageProvider;
 import de.sub.goobi.helper.exceptions.SwapException;
+import io.goobi.workflow.api.connection.HttpUtils;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -316,7 +316,7 @@ public class OidStepPlugin implements IStepPluginVersion2 {
         }
 
         try {
-            response = client.execute(method, HttpClientHelper.stringResponseHandler);
+            response = client.execute(method, HttpUtils.stringResponseHandler);
         } catch (IOException e) {
             log.error("Cannot execute URL " + url, e);
         } finally {
