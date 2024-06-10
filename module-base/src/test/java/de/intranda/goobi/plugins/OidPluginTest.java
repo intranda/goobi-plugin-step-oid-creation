@@ -45,8 +45,9 @@ import ugh.fileformats.mets.MetsMods;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ MetadatenHelper.class, VariableReplacer.class, ConfigurationHelper.class, ProcessManager.class, MetadataManager.class,
-    OidStepPlugin.class })
-@PowerMockIgnore({ "javax.management.*", "javax.net.ssl.*", "jdk.internal.reflect.*" })
+        OidStepPlugin.class })
+@PowerMockIgnore({ "javax.management.*", "javax.net.ssl.*", "jdk.internal.reflect.*", "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*",
+        "org.w3c.*", "javax.crypto.*", "javax.crypto.JceSecurity" })
 
 public class OidPluginTest {
 
@@ -57,7 +58,6 @@ public class OidPluginTest {
     private Process process;
     private Prefs prefs;
     private static String resourcesFolder;
-
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -71,8 +71,6 @@ public class OidPluginTest {
 
     @Before
     public void setUp() throws Exception {
-
-
 
         metadataDirectory = folder.newFolder("metadata");
 
@@ -114,8 +112,8 @@ public class OidPluginTest {
         EasyMock.expect(MetadatenHelper.getMetaFileType(EasyMock.anyString())).andReturn("mets").anyTimes();
         EasyMock.expect(MetadatenHelper.getFileformatByName(EasyMock.anyString(), EasyMock.anyObject())).andReturn(ff).anyTimes();
         EasyMock.expect(MetadatenHelper.getMetadataOfFileformat(EasyMock.anyObject(), EasyMock.anyBoolean()))
-        .andReturn(Collections.emptyMap())
-        .anyTimes();
+                .andReturn(Collections.emptyMap())
+                .anyTimes();
         PowerMock.replay(MetadatenHelper.class);
 
         PowerMock.mockStatic(MetadataManager.class);
@@ -182,16 +180,11 @@ public class OidPluginTest {
 
         // open created file
         Fileformat ff = new MetsMods(prefs);
-        ff.read(processDirectory.getAbsolutePath() +"/meta.xml");
+        ff.read(processDirectory.getAbsolutePath() + "/meta.xml");
         // check oids in mets file
 
         DocStruct log = ff.getDigitalDocument().getLogicalDocStruct();
         assertEquals("300006252", log.getAllMetadataByType(prefs.getMetadataTypeByName("CatalogIDDigital")).get(0).getValue());
-
-        // check Page DocStructs
-        DocStruct page = ff.getDigitalDocument().getPhysicalDocStruct().getAllChildren().get(0);
-        assertEquals("300006253", page.getAllMetadataByType(prefs.getMetadataTypeByName("_urn")).get(0).getValue());
-        assertEquals("300006253.jpg", page.getImageName());
 
         // check file names
         filesInMasterFolder = new File(processDirectory.getAbsolutePath() + "/images/00469418X_master").list();
@@ -220,7 +213,7 @@ public class OidPluginTest {
 
         // open created file
         Fileformat ff = new MetsMods(prefs);
-        ff.read(processDirectory.getAbsolutePath() +"/meta.xml");
+        ff.read(processDirectory.getAbsolutePath() + "/meta.xml");
 
         // check physical structMap
 
@@ -231,9 +224,7 @@ public class OidPluginTest {
         assertEquals("300006253", page.getAllMetadataByType(prefs.getMetadataTypeByName("_urn")).get(0).getValue());
         assertEquals("300006253.jpg", page.getImageName());
 
-
     }
-
 
     public Process getProcess() {
         Project project = new Project();
