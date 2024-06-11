@@ -186,6 +186,11 @@ public class OidPluginTest {
         DocStruct log = ff.getDigitalDocument().getLogicalDocStruct();
         assertEquals("300006252", log.getAllMetadataByType(prefs.getMetadataTypeByName("CatalogIDDigital")).get(0).getValue());
 
+        // check Page DocStructs
+        DocStruct page = ff.getDigitalDocument().getPhysicalDocStruct().getAllChildren().get(0);
+        assertEquals("300006253", page.getAllMetadataByType(prefs.getMetadataTypeByName("_urn")).get(0).getValue());
+        assertEquals("300006253.jpg", page.getImageName());
+
         // check file names
         filesInMasterFolder = new File(processDirectory.getAbsolutePath() + "/images/00469418X_master").list();
         Arrays.sort(filesInMasterFolder);

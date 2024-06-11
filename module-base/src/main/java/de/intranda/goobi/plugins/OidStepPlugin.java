@@ -40,6 +40,7 @@ import io.goobi.workflow.api.connection.HttpUtils;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import ugh.dl.ContentFile;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.DocStructType;
@@ -54,6 +55,8 @@ import ugh.exceptions.UGHException;
 @PluginImplementation
 @Log4j2
 public class OidStepPlugin implements IStepPluginVersion2 {
+
+    private static final long serialVersionUID = 6906916449141089533L;
 
     @Getter
     private String title = "intranda_step_oid_creation";
@@ -242,6 +245,8 @@ public class OidStepPlugin implements IStepPluginVersion2 {
             }
 
             for (DocStruct page : pageList) {
+
+                System.out.println(page.getImageName());
                 List<? extends Metadata> urns = page.getAllMetadataByType(contentIdsType);
                 if (urns.isEmpty()) {
                     try {
@@ -280,13 +285,18 @@ public class OidStepPlugin implements IStepPluginVersion2 {
                         // write new image names to page objects
                         page.setImageName(urn.getValue() + "." + extension);
 
+                        for (ContentFile cf : dd.getFileSet().getAllFiles()) {
+                            String oldLocation = Paths.get(cf.getLocation()).getFileName().toString();
+                            if (oldLocation.equals(oldFilename)) {
+                                cf.setLocation("file://" + urn.getValue() + "." + extension);
+                            }
+                        }
                         counter++;
                     } catch (MetadataTypeNotAllowedException | DocStructHasNoTypeException e) {
                         log.error(e);
                     }
                 }
             }
-
             // save metadata file
             process.writeMetadataFile(fileformat);
 
