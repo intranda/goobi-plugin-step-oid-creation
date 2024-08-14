@@ -26,6 +26,8 @@ Um zu konfigurieren, wie sich das Plugin verhalten soll, können verschiedene We
 ## Überblick und Funktionsweise
 Zur Inbetriebnahme des Plugins muss dieses in einer Aufgabe im Workflow aktiviert werden. Dies erfolgt durch Auswahl des Plugins `intranda_step_oid_creation` aus der Liste der installierten Plugins. Da das Plugin auf eine METS/MODS Datei angewiesen ist, sollte der Arbeitsschritt nach der Metadatenbearbeitung stattfinden.
 
+![Auswahl des Plugins zur Durchführung des Arbeitsschrittes](screen1_de.png)
+
 Nachdem das Plugin vollständig installiert und eingerichtet wurde, wird es üblicherweise automatisch innerhalb des Workflows ausgeführt, so dass keine manuelle Interaktion mit dem Nutzer erfolgt. Stattdessen erfolgt der Aufruf des Plugins durch den Workflow im Hintergrund und führt die Integration der OIDs in die METS/MODS Datei aus.
 
 Hierzu wird die METS/MODS-Datei geöffnet und die darin befindliche Paginierung der Seiten gezählt. Es wird geprüft, ob das Werk oder einzelne Seiten noch keine Object Identifier haben. Ist das der Fall, werden die benötigten OIDs von der konfigurierten API bezogen und in den einzelnen Objekten eingetragen.
