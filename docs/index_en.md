@@ -2,8 +2,11 @@
 title: Object Identifier Generation
 identifier: intranda_step_oid_creation
 published: true
-description: This Step Plugin is used to generate Object Identifiers (OID) and use them
-  within the METS files.
+description: This Step Plugin is used to generate Object Identifiers (OID) and use them within the METS files.
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Step Plugin
 ---
 ## Introduction
 With this plugin, object identifiers for a work and all images can be retrieved from an external service and transferred to the METS file. The images are then renamed so that the file name corresponds to the OID.
